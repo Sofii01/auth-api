@@ -9,6 +9,8 @@ import com.app.authapi.services.interfaces.IUserService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.HashSet;
+
 @Service
 public class UserServiceImpl implements IUserService {
 
@@ -24,13 +26,14 @@ public class UserServiceImpl implements IUserService {
 
     @Override
     public UserDto registerUser(UserDto userDto) {
-        User op = userRepository.findByEmail(userDto.email()).orElseThrow();
+
         User newUser = userMapper.toEntity(userDto);
         String encryptedPassword = passwordEncoder.encode(userDto.password());
         newUser.setPassword(encryptedPassword);
-        if (newUser.getRole() == null) {
-            newUser.setRole(Role.USER);
+        if (newUser.getRoles().isEmpty()) {
+            newUser.getRoles().add(Role.USER);
         }
+
         userRepository.save(newUser);
         return userMapper.toDto(newUser);
     }
