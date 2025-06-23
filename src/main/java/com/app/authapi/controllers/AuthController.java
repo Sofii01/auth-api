@@ -1,5 +1,6 @@
 package com.app.authapi.controllers;
 
+import com.app.authapi.dtos.AuthDto;
 import com.app.authapi.dtos.LoginDto;
 import com.app.authapi.dtos.UserDto;
 import com.app.authapi.jwt.CustomUserDetailsService;
@@ -44,21 +45,14 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public Map<String, Object> login(@RequestBody LoginDto loginDto) {
+    public AuthDto login(@RequestBody LoginDto loginDto) {
         authManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         loginDto.email(), loginDto.password()
                 )
         );
-
         UserDetails userDetails = customUserDetailsService.loadUserByUsername(loginDto.email());
-
         String token = jwtService.generateToken(userDetails);
-
-        return Map.of(
-                "token", token,
-                "email", userDetails.getUsername(),
-                "role", userDetails.getAuthorities()
-        );
+        return new AuthDto(token);
     }
 }
