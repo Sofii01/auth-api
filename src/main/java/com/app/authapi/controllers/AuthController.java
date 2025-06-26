@@ -8,6 +8,8 @@ import com.app.authapi.jwt.JwtService;
 import com.app.authapi.models.entities.User;
 import com.app.authapi.repositories.IUserRepository;
 import com.app.authapi.services.interfaces.IUserService;
+import io.swagger.v3.oas.annotations.Operation;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -38,14 +40,17 @@ public class AuthController {
         this.userRepository = userRepository;
         this.customUserDetailsService = customUserDetailsService;
     }
+
     @PostMapping("/register")
-    public ResponseEntity<UserDto> registerUser(@RequestBody UserDto userDto) {
+    @Operation(summary = "Register a new user")
+    public ResponseEntity<UserDto> registerUser(@Valid @RequestBody UserDto userDto) {
         UserDto user = userService.registerUser(userDto);
         return new ResponseEntity<>(user, HttpStatus.CREATED);
     }
 
     @PostMapping("/login")
-    public AuthDto login(@RequestBody LoginDto loginDto) {
+    @Operation(summary = "Login with email and password")
+    public AuthDto login(@Valid @RequestBody LoginDto loginDto) {
         authManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         loginDto.email(), loginDto.password()
